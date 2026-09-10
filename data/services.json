@@ -1,0 +1,14 @@
+[
+    {
+        "id": 1,
+        "name": "Замена смесителя",
+        "category": "Сантехника",
+        "estimated_hours": 2
+    },
+    {
+        "id": 2,
+        "name": "Установка розетки",
+        "category": "Электрика",
+        "estimated_hours": 1
+    }
+]

@@ -1,0 +1,18 @@
+[
+    {
+        "id": 1,
+        "name": "Петров Алексей Сергеевич",
+        "specialty": "Сантехник",
+        "experience": 7,
+        "rating": 4.8,
+        "price_per_hour": 1500
+    },
+    {
+        "id": 2,
+        "name": "Сидорова Мария Ивановна",
+        "specialty": "Электрик",
+        "experience": 5,
+        "rating": 4.5,
+        "price_per_hour": 1300
+    }
+]
