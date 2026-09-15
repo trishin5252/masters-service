@@ -107,4 +107,3 @@ if __name__ == "__main__":
         print(f"Ожидаемое завершение: {completion_date}")
 
     print("\n" + "=" * 40)
-'@ | Out-File -FilePath "main.py" -Encoding UTF8
