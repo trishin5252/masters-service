@@ -1,0 +1,16 @@
+[
+    {
+        "id": 1,
+        "name": "Иванов Сергей",
+        "specialty": "Сантехник",
+        "rating": 4.8,
+        "experience_years": 7
+    },
+    {
+        "id": 2,
+        "name": "Петрова Анна",
+        "specialty": "Электрик",
+        "rating": 4.9,
+        "experience_years": 5
+    }
+]

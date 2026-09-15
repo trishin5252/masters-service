@@ -1,0 +1,16 @@
+[
+    {
+        "id": 1,
+        "master_id": 1,
+        "name": "Замена смесителя",
+        "price": 1500.0,
+        "duration_hours": 2
+    },
+    {
+        "id": 2,
+        "master_id": 2,
+        "name": "Установка розетки",
+        "price": 500.0,
+        "duration_hours": 1
+    }
+]
