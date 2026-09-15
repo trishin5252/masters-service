@@ -61,3 +61,11 @@
 - flake8
 
 Установка зависимостей:
+pip install -r requirements.txt
+запуск программы:
+python main.py
+Запуск тестов:
+pytest
+Проверка качества кода:
+flake8
+
