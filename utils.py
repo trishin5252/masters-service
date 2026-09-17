@@ -12,6 +12,15 @@ def input_int(prompt: str) -> int:
             print("Ошибка: введите корректное целое число.")
 
 
+def input_float(prompt: str) -> float:
+    """Запросить вещественное число с обработкой ошибок."""
+    while True:
+        try:
+            return float(input(prompt).replace(',', '.'))
+        except ValueError:
+            print("Ошибка: введите число, например 4.5.")
+
+
 def input_date(prompt: str) -> date:
     """Запросить дату у пользователя в формате ГГГГ-ММ-ДД."""
     while True:
@@ -44,7 +53,9 @@ def show_menu() -> int:
     print("4. Создать заказ")
     print("5. Показать все заказы")
     print("6. Отменить заказ")
-    print("7. Показать список специальностей")
+    print("7. Показать пользователей")
+    print("8. Показать список специальностей")
+    print("9. Показать статистику заказов")
     print("0. Выход")
     
     return input_int("Выберите действие: ")
