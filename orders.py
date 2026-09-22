@@ -1,7 +1,7 @@
 """Класс заказа и функции обработки коллекции заказов."""
 
 from datetime import date
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from masters import Master
 from users import User
@@ -10,23 +10,36 @@ from users import User
 class Order:
     """Заказ клиента на услугу мастера."""
 
-    def __init__(self, order_id: int, master: Master, user: Optional[User],
+    def __init__(self, order_id: int, master: Master, user: User,
                  client_name: str, service_name: str, booking_date: date,
                  status: str = 'Создан') -> None:
+        if not isinstance(master, Master) or not isinstance(user, User):
+            raise ValueError('Заказ должен быть связан с мастером и клиентом.')
+        if order_id <= 0 or not service_name.strip():
+            raise ValueError('Укажите положительный ID и название услуги.')
+        if not isinstance(booking_date, date):
+            raise ValueError('Некорректная дата заказа.')
+        if status not in ('Создан', 'Отменён'):
+            raise ValueError('Неизвестный статус заказа.')
         self.id = order_id
         self.master = master
         self.user = user
         self.client_name = client_name
         self.service_name = service_name
         self.booking_date = booking_date
-        self.status = status
+        self._status = status
+
+    @property
+    def status(self) -> str:
+        """Состояние меняется через метод cancel()."""
+        return self._status
 
     @property
     def is_cancelled(self) -> bool:
         return self.status == 'Отменён'
 
     def cancel(self) -> None:
-        self.status = 'Отменён'
+        self._status = 'Отменён'
 
     def __str__(self) -> str:
         return (f"Заказ #{self.id}: {self.service_name} для {self.client_name} "
@@ -45,7 +58,7 @@ def is_master_available(orders: List[Order], master_id: int, booking_date: date)
                    and not order.is_cancelled for order in orders)
 
 
-def create_order(orders: List[Order], master: Master, user: Optional[User],
+def create_order(orders: List[Order], master: Master, user: User,
                  client_name: str, service_name: str, booking_date: date) -> Order:
     if not is_master_available(orders, master.id, booking_date):
         raise ValueError('Мастер уже занят на указанную дату.')

@@ -1,4 +1,5 @@
 from datetime import date
+from math import isfinite
 import storage
 
 
@@ -16,7 +17,10 @@ def input_float(prompt: str) -> float:
     """Запросить вещественное число с обработкой ошибок."""
     while True:
         try:
-            return float(input(prompt).replace(',', '.'))
+            value = float(input(prompt).replace(',', '.'))
+            if not isfinite(value) or not 0 <= value <= 5:
+                raise ValueError('Рейтинг должен быть от 0 до 5.')
+            return value
         except ValueError:
             print("Ошибка: введите число, например 4.5.")
 
@@ -34,8 +38,14 @@ def input_date(prompt: str) -> date:
 
 def show_specialties() -> None:
     """Вывести список доступных специальностей и услуг."""
-    specialties = storage.load_json('data/specialties.json')
-    
+    try:
+        specialties = storage.load_json('data/specialties.json')
+        if not isinstance(specialties, dict):
+            raise ValueError('Справочник должен быть словарём.')
+    except (OSError, ValueError) as error:
+        print(f'Не удалось открыть справочник: {error}')
+        return
+
     print("\n=== ДОСТУПНЫЕ СПЕЦИАЛЬНОСТИ И УСЛУГИ ===")
     for category, services in specialties.items():
         print(f"\n{category}:")
@@ -56,6 +66,8 @@ def show_menu() -> int:
     print("7. Показать пользователей")
     print("8. Показать список специальностей")
     print("9. Показать статистику заказов")
+    print("10. Добавить пользователя")
+    print("11. Показать каталог услуг")
     print("0. Выход")
-    
+
     return input_int("Выберите действие: ")

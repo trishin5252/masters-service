@@ -16,7 +16,7 @@ class Master:
         self.price_per_hour = price_per_hour
 
     def __str__(self) -> str:
-        return (f"Мастер: {self.name}\n"
+        return (f"Мастер #{self.id}: {self.name}\n"
                 f"  Специальность: {self.specialty}\n"
                 f"  Опыт: {self.experience} лет\n"
                 f"  Рейтинг: {self.rating}\n"
@@ -24,6 +24,10 @@ class Master:
 
     def to_dict(self) -> Dict[str, Any]:
         return self.__dict__.copy()
+
+    def meets_rating(self, minimum: float) -> bool:
+        """Проверить соответствие мастера минимальному рейтингу."""
+        return self.rating >= minimum
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Master':
@@ -40,7 +44,7 @@ def find_masters_by_specialty(masters: List[Master], specialty: str) -> List[Mas
 
 
 def filter_masters_by_rating(masters: List[Master], min_rating: float) -> List[Master]:
-    return [master for master in masters if master.rating >= min_rating]
+    return [master for master in masters if master.meets_rating(min_rating)]
 
 
 def sort_masters_by_rating(masters: List[Master]) -> List[Master]:

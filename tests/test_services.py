@@ -1,5 +1,6 @@
 """Тесты для модуля работы с услугами."""
 from services import (
+    Service,
     find_service_by_id,
     get_services_by_master,
     add_service,
@@ -26,10 +27,11 @@ def test_find_service_by_id():
         }
     ]
 
+    services = [Service.from_dict(item) for item in services]
     service = find_service_by_id(services, 1)
     assert service is not None
-    assert service['name'] == 'Замена смесителя'
-    assert service['id'] == 1
+    assert service.name == 'Замена смесителя'
+    assert service.id == 1
 
 
 def test_find_service_by_id_not_found():
@@ -44,7 +46,7 @@ def test_find_service_by_id_not_found():
         }
     ]
 
-    service = find_service_by_id(services, 999)
+    service = find_service_by_id([Service.from_dict(s) for s in services], 999)
     assert service is None
 
 
@@ -74,9 +76,10 @@ def test_get_services_by_master():
         }
     ]
 
+    services = [Service.from_dict(item) for item in services]
     master_services = get_services_by_master(services, 1)
     assert len(master_services) == 2
-    assert all(s['master_id'] == 1 for s in master_services)
+    assert all(s.master_id == 1 for s in master_services)
 
 
 def test_add_service():
@@ -88,11 +91,11 @@ def test_add_service():
     )
 
     assert len(services) == 1
-    assert new_service['id'] == 1
-    assert new_service['master_id'] == 1
-    assert new_service['name'] == 'Ремонт трубы'
-    assert new_service['price'] == 1000.0
-    assert new_service['duration_hours'] == 2
+    assert new_service.id == 1
+    assert new_service.master_id == 1
+    assert new_service.name == 'Ремонт трубы'
+    assert new_service.price == 1000.0
+    assert new_service.estimated_hours == 2
 
 
 def test_calculate_service_cost():
@@ -105,6 +108,7 @@ def test_calculate_service_cost():
         'duration_hours': 2
     }
 
+    service = Service.from_dict(service)
     total = calculate_service_cost(service, 0.0)
     assert total == 3000.0
 

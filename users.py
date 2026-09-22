@@ -8,6 +8,8 @@ class User:
 
     def __init__(self, user_id: int, name: str, role: str = 'Клиент',
                  phone: str = '') -> None:
+        if user_id <= 0 or not name.strip():
+            raise ValueError('У пользователя должны быть положительный ID и имя.')
         self.id = user_id
         self.name = name
         self.role = role
@@ -35,3 +37,10 @@ def get_user_info(user: User) -> str:
 
 def next_user_id(users: List[User]) -> int:
     return max((user.id for user in users), default=0) + 1
+
+
+def add_user(users: List[User], name: str, phone: str = '') -> User:
+    """Создать клиента и добавить его в коллекцию."""
+    user = User(next_user_id(users), name.strip(), phone=phone.strip())
+    users.append(user)
+    return user
