@@ -1,14 +1,13 @@
 from typing import List
 
-import masters
-import orders
-import services
 import storage
 import utils
-import users
+from models.master import Master
+from operations import (master_actions, order_actions, service_catalog,
+                        user_actions)
 
 
-def show_all_masters(masters_list: List[masters.Master]) -> None:
+def show_all_masters(masters_list: List[Master]) -> None:
     """Вывести информацию обо всех мастерах."""
     if not masters_list:
         print("Список мастеров пуст.")
@@ -51,14 +50,14 @@ def main() -> None:
 
         elif choice == 1:
             # Показать всех мастеров
-            sorted_masters = masters.sort_masters_by_rating(masters_list)
+            sorted_masters = master_actions.sort_masters_by_rating(masters_list)
             show_all_masters(sorted_masters)
 
         elif choice == 2:
             # Поиск мастера по специальности — СНАЧАЛА ПОКАЗЫВАЕМ СПЕЦИАЛЬНОСТИ
             utils.show_specialties()
             specialty = input("\nВведите название специальности (или услуги): ")
-            found = masters.find_masters_by_specialty(masters_list, specialty)
+            found = master_actions.find_masters_by_specialty(masters_list, specialty)
             if found:
                 show_all_masters(found)
             else:
@@ -67,7 +66,7 @@ def main() -> None:
         elif choice == 3:
             # Мастера с высоким рейтингом
             min_rating = utils.input_float("Введите минимальный рейтинг (например, 4.5): ")
-            filtered = masters.filter_masters_by_rating(masters_list, min_rating)
+            filtered = master_actions.filter_masters_by_rating(masters_list, min_rating)
             if filtered:
                 show_all_masters(filtered)
             else:
@@ -78,7 +77,7 @@ def main() -> None:
             print("\n СОЗДАНИЕ ЗАКАЗА ")
             utils.show_specialties()
             master_id = utils.input_int("Введите ID мастера: ")
-            master = masters.find_master_by_id(masters_list, master_id)
+            master = master_actions.find_master_by_id(masters_list, master_id)
 
             if not master:
                 print(f"Мастер с ID {master_id} не найден.")
@@ -87,7 +86,7 @@ def main() -> None:
             for user in users_list:
                 print(user)
             user_id = utils.input_int("Введите ID пользователя: ")
-            user = users.find_user_by_id(users_list, user_id)
+            user = user_actions.find_user_by_id(users_list, user_id)
             if user is None:
                 print(f"Пользователь с ID {user_id} не найден.")
                 continue
@@ -95,14 +94,14 @@ def main() -> None:
             for service in services_list:
                 print(service)
             service_id = utils.input_int('Введите ID услуги: ')
-            service = services.find_service_by_id(services_list, service_id)
+            service = service_catalog.find_service_by_id(services_list, service_id)
             if service is None:
                 print(f'Услуга с ID {service_id} не найдена.')
                 continue
             booking_date = utils.input_date("Введите дату (ГГГГ-ММ-ДД): ")
 
             try:
-                new_order = orders.create_order(
+                new_order = order_actions.create_order(
                     orders_list, master, user, service, booking_date
                 )
             except ValueError as error:
@@ -123,7 +122,7 @@ def main() -> None:
         elif choice == 6:
             # Отменить заказ
             order_id = utils.input_int("Введите ID заказа для отмены: ")
-            if orders.cancel_order(orders_list, order_id):
+            if order_actions.cancel_order(orders_list, order_id):
                 print(f"Заказ #{order_id} отменён.")
             else:
                 print(f"Заказ #{order_id} не найден.")
@@ -138,7 +137,7 @@ def main() -> None:
 
         elif choice == 9:
             print("\n СТАТИСТИКА ЗАКАЗОВ ")
-            for name, count in orders.get_order_statistics(orders_list).items():
+            for name, count in order_actions.get_order_statistics(orders_list).items():
                 print(f"{name}: {count}")
 
         elif choice == 11:
@@ -147,7 +146,7 @@ def main() -> None:
 
         elif choice == 10:
             try:
-                user = users.add_user(
+                user = user_actions.add_user(
                     users_list, input('Имя клиента: '), input('Телефон: '))
                 print(f'Добавлен пользователь: {user}')
             except ValueError as error:

@@ -1,4 +1,4 @@
-"""Функции обработки коллекции заказов."""
+"""Операции над коллекцией заказов."""
 
 from datetime import date
 from typing import Dict, List
@@ -9,7 +9,8 @@ from models.service import Service
 from models.user import User
 
 
-def is_master_available(orders: List[Order], master_id: int, booking_date: date) -> bool:
+def is_master_available(orders: List[Order], master_id: int,
+                        booking_date: date) -> bool:
     return not any(order.master.id == master_id
                    and order.booking_date == booking_date
                    and not order.is_cancelled for order in orders)

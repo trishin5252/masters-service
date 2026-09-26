@@ -1,10 +1,12 @@
 from datetime import date
 
-from masters import Master
-from users import User
-from services import Service
-from orders import cancel_order, create_order, find_orders_by_master
-from orders import get_order_statistics, is_master_available
+from models.master import Master
+from models.service import Service
+from models.user import User
+from operations.order_actions import (cancel_order, create_order,
+                                      find_orders_by_master,
+                                      get_order_statistics,
+                                      is_master_available)
 
 
 def test_create_order():

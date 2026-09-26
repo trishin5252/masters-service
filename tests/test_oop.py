@@ -7,10 +7,12 @@ import pytest
 
 import main
 import storage
-from masters import Master, sort_masters_by_rating
-from orders import create_order, is_master_available
-from services import Service
-from users import User, add_user
+from models.master import Master
+from models.service import Service
+from models.user import User
+from operations.master_actions import sort_masters_by_rating
+from operations.order_actions import create_order, is_master_available
+from operations.user_actions import add_user
 
 
 def sample():

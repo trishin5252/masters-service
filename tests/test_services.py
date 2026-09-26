@@ -1,11 +1,8 @@
 """Тесты для модуля работы с услугами."""
-from services import (
-    Service,
-    find_service_by_id,
-    get_services_by_master,
-    add_service,
-    calculate_service_cost
-)
+from models.service import Service
+from operations.service_catalog import (add_service, calculate_service_cost,
+                                        find_service_by_id,
+                                        get_services_by_master)
 
 
 def test_find_service_by_id():

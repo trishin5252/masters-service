@@ -3,10 +3,11 @@ from typing import List, Dict, Any
 from datetime import date
 from pathlib import Path
 
-from masters import Master
-from users import User
-from orders import Order
-from services import Service
+from models.master import Master
+from models.order import Order
+from models.service import Service
+from models.user import User
+from operations.user_actions import add_user
 
 
 def data_path(filename: str) -> Path:
@@ -66,7 +67,6 @@ def load_orders(filename: str, masters: List[Master], users: List[User],
         if user is None:
             if item.get('user_id'):
                 raise ValueError(f"Заказ {item['id']}: клиент не найден.")
-            from users import add_user
             user = add_user(users, item.get('client_name', ''))
         if service is None:
             service = next((s for s in services

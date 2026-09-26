@@ -1,5 +1,7 @@
-from masters import (Master, filter_masters_by_rating, find_master_by_id,
-                     find_masters_by_specialty)
+from models.master import Master
+from operations.master_actions import (filter_masters_by_rating,
+                                       find_master_by_id,
+                                       find_masters_by_specialty)
 
 
 def test_find_master_by_id():
