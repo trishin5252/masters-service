@@ -9,40 +9,43 @@ import main
 import storage
 from masters import Master, sort_masters_by_rating
 from orders import create_order, is_master_available
+from services import Service
 from users import User, add_user
 
 
 def sample():
-    return Master(1, 'Мастер', 'Электрик', 5, 4.8, 1000), User(1, 'Клиент')
+    return (Master(1, 'Мастер', 'Электрик', 5, 4.8, 1000),
+            User(1, 'Клиент'), Service(1, 'Ремонт'))
 
 
 def test_duplicate_and_cancel():
-    master, user = sample()
+    master, user, service = sample()
     items = []
     day = date(2026, 10, 1)
-    order = create_order(items, master, user, user.name, 'Ремонт', day)
-    assert order.master is master and order.user is user
+    order = create_order(items, master, user, service, day)
+    assert order.master is master and order.user is user and order.service is service
     with pytest.raises(ValueError):
-        create_order(items, master, user, user.name, 'Монтаж', day)
+        create_order(items, master, user, Service(2, 'Монтаж'), day)
     assert len(items) == 1
     order.cancel()
     assert is_master_available(items, master.id, day)
-    assert create_order(items, master, user, user.name, 'Монтаж', day).id == 2
+    assert create_order(items, master, user, Service(2, 'Монтаж'), day).id == 2
 
 
 def test_json_roundtrip(tmp_path):
-    master, user = sample()
+    master, user, service = sample()
     items = []
-    order = create_order(items, master, user, user.name, 'Ремонт', date.today())
+    order = create_order(items, master, user, service, date.today())
     order.cancel()
-    paths = [str(tmp_path / name) for name in ('m.json', 'u.json', 'o.json')]
-    for path, values in zip(paths, ([master], [user], items)):
+    paths = [str(tmp_path / name) for name in ('m.json', 'u.json', 's.json', 'o.json')]
+    for path, values in zip(paths, ([master], [user], [service], items)):
         storage.save_objects(path, values)
     masters = storage.load_masters(paths[0])
     users = storage.load_users(paths[1])
-    loaded = storage.load_orders(paths[2], masters, users)
+    services = storage.load_services(paths[2])
+    loaded = storage.load_orders(paths[3], masters, users, services)
     assert loaded[0].master is masters[0]
-    assert loaded[0].user is users[0]
+    assert loaded[0].user is users[0] and loaded[0].service is services[0]
     assert loaded[0].is_cancelled
     assert loaded[0].to_dict() == order.to_dict()
 
@@ -51,7 +54,7 @@ def test_missing_reference_rejected(tmp_path):
     path = str(tmp_path / 'orders.json')
     storage.save_json(path, [{'id': 1, 'master_id': 99, 'user_id': 1}])
     with pytest.raises(ValueError, match='мастер'):
-        storage.load_orders(path, [], [User(1, 'Клиент')])
+        storage.load_orders(path, [], [User(1, 'Клиент')], [Service(1, 'Ремонт')])
 
 
 def test_corrupt_json_is_preserved(tmp_path):
@@ -73,7 +76,7 @@ def test_users_and_strings():
 
 
 def test_rating_and_sort():
-    master, _ = sample()
+    master, _, _ = sample()
     other = Master(2, 'Другой', 'Электрик', 1, 3.5, 500)
     assert master.meets_rating(4.5)
     assert sort_masters_by_rating([other, master]) == [master, other]
@@ -81,17 +84,17 @@ def test_rating_and_sort():
 
 
 def test_console_create_and_save(tmp_path, monkeypatch, capsys):
-    master, user = sample()
+    master, user, service = sample()
     monkeypatch.setattr(storage, 'data_path', lambda name: tmp_path / name.split('/')[-1])
     storage.save_objects('masters.json', [master])
     storage.save_objects('users.json', [user])
+    storage.save_objects('services.json', [service])
     storage.save_json('orders.json', [])
-    storage.save_json('services.json', [])
     storage.save_json('specialties.json', {})
-    answers = ['4', '1', '1', 'Ремонт', '2026-10-01', '5', '6', '1', '9', '0']
+    answers = ['4', '1', '1', '1', '2026-10-01', '5', '6', '1', '9', '0']
     with patch('builtins.input', side_effect=answers):
         main.main()
     output = capsys.readouterr().out
     assert 'Заказ #1 создан!' in output
     assert 'Данные сохранены' in output
-    assert storage.load_orders('orders.json', [master], [user])[0].is_cancelled
+    assert storage.load_orders('orders.json', [master], [user], [service])[0].is_cancelled

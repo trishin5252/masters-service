@@ -2,6 +2,7 @@ from typing import List
 
 import masters
 import orders
+import services
 import storage
 import utils
 import users
@@ -15,7 +16,7 @@ def show_all_masters(masters_list: List[masters.Master]) -> None:
 
     print("\n СПИСОК МАСТЕРОВ ")
     for master in masters_list:
-        print(masters.get_master_info(master))
+        print(master)
         print("-" * 40)
 
 
@@ -27,7 +28,7 @@ def main() -> None:
         services_list = storage.load_services('data/services.json')
         users_list = storage.load_users('data/users.json')
         orders_list = storage.load_orders(
-            'data/orders.json', masters_list, users_list)
+            'data/orders.json', masters_list, users_list, services_list)
     except (OSError, ValueError, KeyError, TypeError) as error:
         print(f'Не удалось загрузить данные: {error}')
         return
@@ -90,14 +91,19 @@ def main() -> None:
             if user is None:
                 print(f"Пользователь с ID {user_id} не найден.")
                 continue
-            client_name = user.name
-            service_name = input("Введите название услуги: ")
+            print('\n КАТАЛОГ УСЛУГ ')
+            for service in services_list:
+                print(service)
+            service_id = utils.input_int('Введите ID услуги: ')
+            service = services.find_service_by_id(services_list, service_id)
+            if service is None:
+                print(f'Услуга с ID {service_id} не найдена.')
+                continue
             booking_date = utils.input_date("Введите дату (ГГГГ-ММ-ДД): ")
 
             try:
                 new_order = orders.create_order(
-                    orders_list, master, user, client_name, service_name,
-                    booking_date
+                    orders_list, master, user, service, booking_date
                 )
             except ValueError as error:
                 print(f"Заказ не создан: {error}")
@@ -111,7 +117,7 @@ def main() -> None:
             else:
                 print("\n ВСЕ ЗАКАЗЫ ")
                 for order in orders_list:
-                    print(orders.get_order_status(order))
+                    print(order)
                     print("-" * 40)
 
         elif choice == 6:
@@ -125,7 +131,7 @@ def main() -> None:
         elif choice == 7:
             print("\n ПОЛЬЗОВАТЕЛИ ")
             for user in users_list:
-                print(users.get_user_info(user))
+                print(user)
 
         elif choice == 8:
             utils.show_specialties()
