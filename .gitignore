@@ -6,3 +6,7 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+db.sqlite3
+.pytest_cache/
+.test-temp/
+.pip-temp/
