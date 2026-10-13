@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Заказы — Сервис поиска мастеров{% endblock %}
+
+{% block content %}
+<section class="section-heading">
+  <p class="eyebrow">История записей</p>
+  <h1>Заказы</h1>
+  <p>Найдено заказов: {{ orders|length }}.</p>
+</section>
+<div class="order-list">
+  {% for order in orders %}
+    <article class="order-row">
+      <div>
+        <p class="order-number">Заказ №{{ order.id }}</p>
+        <h2><a href="{% url 'orders:detail' order.id %}">{{ order.service.name }}</a></h2>
+        <p>{{ order.booking_date|date:'d.m.Y' }} · {{ order.master.name }}</p>
+      </div>
+      {% include 'orders/includes/order_status.html' %}
+    </article>
+  {% empty %}
+    <p class="empty-state">Заказов пока нет.</p>
+  {% endfor %}
+</div>
+{% endblock %}

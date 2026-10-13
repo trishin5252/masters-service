@@ -1,0 +1,5 @@
+{% if order.is_cancelled %}
+  <span class="status status-cancelled">Отменён</span>
+{% else %}
+  <span class="status status-active">Активен</span>
+{% endif %}

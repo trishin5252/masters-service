@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная — Сервис поиска мастеров{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">Проверенные специалисты для ваших задач</p>
+  <h1>Найдите мастера<br><span>для нужной работы</span></h1>
+  <p class="hero-description">Просматривайте мастеров, изучайте услуги и следите за заказами в одном месте.</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary btn-lg" href="{% url 'masters:list' %}">Смотреть мастеров</a>
+    <a class="btn btn-outline-primary btn-lg" href="{% url 'services:list' %}">Каталог услуг</a>
+  </div>
+</section>
+
+<section class="section-space" aria-labelledby="sections-title">
+  <div class="section-heading">
+    <p class="eyebrow">Разделы сервиса</p>
+    <h2 id="sections-title">Всё для удобного выбора</h2>
+  </div>
+  <div class="row g-4">
+    <div class="col-md-4">
+      <a class="feature-card" href="{% url 'masters:list' %}">
+        <span class="feature-number">01</span>
+        <h3>Мастера</h3>
+        <p>Специализации, опыт, рейтинг и стоимость работы.</p>
+        <span class="feature-link">Выбрать мастера →</span>
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a class="feature-card" href="{% url 'services:list' %}">
+        <span class="feature-number">02</span>
+        <h3>Услуги</h3>
+        <p>Каталог работ с категориями и примерным временем.</p>
+        <span class="feature-link">Открыть каталог →</span>
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a class="feature-card" href="{% url 'orders:list' %}">
+        <span class="feature-number">03</span>
+        <h3>Заказы</h3>
+        <p>Информация о выбранной услуге, мастере и дате.</p>
+        <span class="feature-link">Посмотреть заказы →</span>
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

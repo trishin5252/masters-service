@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if order %}Заказ №{{ order.id }}{% else %}Заказ не найден{% endif %} — Сервис поиска мастеров{% endblock %}
+
+{% block content %}
+<a class="back-link" href="{% url 'orders:list' %}">← К списку заказов</a>
+{% if order %}
+  <article class="detail-card">
+    <div class="detail-title-row">
+      <div><p class="eyebrow">Информация о заказе</p><h1>Заказ №{{ order.id }}</h1></div>
+      {% include 'orders/includes/order_status.html' %}
+    </div>
+    <dl class="detail-grid">
+      <div><dt>Услуга</dt><dd>{{ order.service.name }}</dd></div>
+      <div><dt>Мастер</dt><dd><a href="{% url 'masters:detail' order.master.id %}">{{ order.master.name }}</a></dd></div>
+      <div><dt>Клиент</dt><dd>{{ order.user.name }}</dd></div>
+      <div><dt>Дата записи</dt><dd>{{ order.booking_date|date:'d.m.Y' }}</dd></div>
+    </dl>
+    <button class="btn btn-outline-primary" type="button" data-copy-link>Скопировать ссылку</button>
+    <span class="copy-feedback" data-copy-feedback role="status" aria-live="polite"></span>
+  </article>
+{% else %}
+  <div class="empty-state"><h1>Заказ не найден</h1><p>Проверьте номер заказа или вернитесь к списку.</p></div>
+{% endif %}
+{% endblock %}

@@ -17,12 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-from masters import views as master_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('homepage.urls')),
     path('masters/', include('masters.urls')),
-    path('services/', master_views.services_list, name='services_list'),
+    path('services/', include('masters.services_urls')),
     path('orders/', include('orders.urls')),
 ]

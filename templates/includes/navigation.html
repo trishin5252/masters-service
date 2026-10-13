@@ -1,0 +1,15 @@
+{% load static %}
+<nav class="site-nav" aria-label="Основная навигация">
+  <div class="container nav-layout">
+    <a class="brand" href="{% url 'homepage:index' %}">
+      <img src="{% static 'homepage/img/logo.svg' %}" width="38" height="38" alt="Логотип сервиса">
+      <span>МАСТЕР<span class="brand-accent">РЯДОМ</span></span>
+    </a>
+    <div class="nav-links">
+      <a data-nav-link href="{% url 'homepage:index' %}">Главная</a>
+      <a data-nav-link href="{% url 'masters:list' %}">Мастера</a>
+      <a data-nav-link href="{% url 'services:list' %}">Услуги</a>
+      <a data-nav-link href="{% url 'orders:list' %}">Заказы</a>
+    </div>
+  </div>
+</nav>

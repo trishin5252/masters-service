@@ -4,7 +4,9 @@ from django.urls import path
 
 from . import views
 
+app_name = 'orders'
+
 urlpatterns = [
-    path('', views.orders_list, name='orders_list'),
-    path('<int:order_id>/', views.order_detail, name='order_detail'),
+    path('', views.orders_list, name='list'),
+    path('<int:order_id>/', views.order_detail, name='detail'),
 ]

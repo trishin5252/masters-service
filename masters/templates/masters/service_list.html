@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Услуги — Сервис поиска мастеров{% endblock %}
+
+{% block content %}
+<section class="section-heading">
+  <p class="eyebrow">Что мы предлагаем</p>
+  <h1>Каталог услуг</h1>
+  <p>Услуг в каталоге: {{ services|length }}.</p>
+</section>
+<div class="row g-4">
+  {% for service in services %}
+    <div class="col-md-6">
+      <article class="service-card h-100">
+        <span class="service-category">{{ service.category|default:'Без категории' }}</span>
+        <h2>{{ service.name }}</h2>
+        <p>Примерное время: {{ service.estimated_hours }} ч.</p>
+        <p class="service-price">{{ service.price }} ₽</p>
+      </article>
+    </div>
+  {% empty %}
+    <div class="col-12"><p class="empty-state">Услуг пока нет.</p></div>
+  {% endfor %}
+</div>
+{% endblock %}

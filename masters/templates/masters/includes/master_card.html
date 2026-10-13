@@ -1,0 +1,13 @@
+<article class="master-card h-100">
+  <div class="master-card-top">
+    <span class="avatar">{{ master.name|first|upper }}</span>
+    <span class="rating">★ {{ master.rating|default:'—' }}</span>
+  </div>
+  <h2>{{ master.name }}</h2>
+  <p class="specialty">{{ master.specialty|default:'Специализация не указана' }}</p>
+  <div class="master-facts">
+    <span>Опыт: {{ master.experience }} лет</span>
+    <span>от {{ master.price_per_hour }} ₽/час</span>
+  </div>
+  <a class="btn btn-outline-primary" href="{% url 'masters:detail' master.id %}">Подробнее</a>
+</article>

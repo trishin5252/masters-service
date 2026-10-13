@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Мастера — Сервис поиска мастеров{% endblock %}
+
+{% block content %}
+<section class="section-heading">
+  <p class="eyebrow">Найдите исполнителя</p>
+  <h1>Наши мастера</h1>
+  <p>Специалистов в каталоге: {{ masters|length }}. Выберите профиль, чтобы узнать подробности.</p>
+</section>
+<div class="row g-4">
+  {% for master in masters %}
+    <div class="col-md-6">
+      {% include 'masters/includes/master_card.html' %}
+    </div>
+  {% empty %}
+    <div class="col-12"><p class="empty-state">Мастеров пока нет.</p></div>
+  {% endfor %}
+</div>
+{% endblock %}

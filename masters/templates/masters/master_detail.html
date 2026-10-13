@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if master %}{{ master.name }}{% else %}Мастер не найден{% endif %} — Сервис поиска мастеров{% endblock %}
+
+{% block content %}
+<a class="back-link" href="{% url 'masters:list' %}">← К списку мастеров</a>
+{% if master %}
+  <article class="detail-card">
+    <div class="detail-header">
+      <span class="avatar avatar-large">{{ master.name|first|upper }}</span>
+      <div>
+        <p class="eyebrow">Профиль мастера</p>
+        <h1>{{ master.name }}</h1>
+        <p class="specialty">{{ master.specialty|default:'Специализация не указана' }}</p>
+      </div>
+    </div>
+    <dl class="detail-grid">
+      <div><dt>Опыт</dt><dd>{{ master.experience }} лет</dd></div>
+      <div><dt>Рейтинг</dt><dd>★ {{ master.rating }}</dd></div>
+      <div><dt>Стоимость</dt><dd>{{ master.price_per_hour }} ₽/час</dd></div>
+      <div><dt>На сегодня</dt><dd>
+        {% if available %}<span class="status status-active">Доступен</span>
+        {% else %}<span class="status status-busy">Занят</span>{% endif %}
+      </dd></div>
+    </dl>
+    <button class="btn btn-outline-primary" type="button" data-copy-link>Скопировать ссылку</button>
+    <span class="copy-feedback" data-copy-feedback role="status" aria-live="polite"></span>
+  </article>
+{% else %}
+  <div class="empty-state"><h1>Мастер не найден</h1><p>Проверьте номер мастера или вернитесь к списку.</p></div>
+{% endif %}
+{% endblock %}
