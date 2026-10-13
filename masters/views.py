@@ -5,35 +5,55 @@ from datetime import date
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-import storage
-from operations.master_actions import find_master_by_id
-from operations.order_actions import is_master_available
+from db import repository
 
 
 def masters_list(request: HttpRequest) -> HttpResponse:
-    """Передать список мастеров из JSON в шаблон."""
-    masters = storage.load_masters('data/masters.json')
-    return render(request, 'masters/master_list.html', {'masters': masters})
+    """Передать список мастеров из SQLite с поиском по рейтингу."""
+    minimum = request.GET.get('min_rating', '').strip()
+    try:
+        minimum_rating = float(minimum) if minimum else None
+        if minimum_rating is not None and not 0 <= minimum_rating <= 5:
+            raise ValueError
+    except ValueError:
+        minimum_rating = None
+        minimum = ''
+    return render(request, 'masters/master_list.html', {
+        'masters': repository.masters(minimum_rating),
+        'min_rating': minimum,
+    })
 
 
 def master_detail(request: HttpRequest, master_id: int) -> HttpResponse:
     """Передать мастера и его доступность в шаблон или вернуть 404."""
-    masters = storage.load_masters('data/masters.json')
-    master = find_master_by_id(masters, master_id)
+    master = repository.master_by_id(master_id)
     if master is None:
         return render(request, 'masters/master_detail.html',
                       {'master': None}, status=404)
 
-    users = storage.load_users('data/users.json')
-    services = storage.load_services('data/services.json')
-    orders = storage.load_orders('data/orders.json', masters, users, services)
-    available = is_master_available(orders, master.id, date.today())
+    available = repository.master_available(master.id, date.today())
     return render(request, 'masters/master_detail.html',
-                  {'master': master, 'available': available})
+                  {'master': master, 'available': available,
+                   'master_orders': repository.master_orders(master.id)})
 
 
 def services_list(request: HttpRequest) -> HttpResponse:
-    """Передать каталог услуг из JSON в шаблон."""
-    services = storage.load_services('data/services.json')
+    """Передать каталог услуг из SQLite в шаблон."""
+    category = request.GET.get('category', '').strip()
     return render(request, 'masters/service_list.html',
-                  {'services': services})
+                  {'services': repository.services(category),
+                   'categories': repository.service_categories(),
+                   'selected_category': category})
+
+
+def available_masters(request: HttpRequest) -> HttpResponse:
+    """Найти свободных мастеров SQL-запросом на выбранную дату."""
+    value = request.GET.get('date', '').strip()
+    try:
+        selected_date = date.fromisoformat(value) if value else date.today()
+    except ValueError:
+        selected_date = date.today()
+    return render(request, 'masters/available.html', {
+        'masters': repository.available_masters(selected_date),
+        'selected_date': selected_date,
+    })

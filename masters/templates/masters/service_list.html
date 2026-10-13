@@ -7,6 +7,17 @@
   <p class="eyebrow">Что мы предлагаем</p>
   <h1>Каталог услуг</h1>
   <p>Услуг в каталоге: {{ services|length }}.</p>
+  <form method="get" class="d-flex gap-2 align-items-end">
+    <label>Категория
+      <select class="form-select" name="category">
+        <option value="">Все</option>
+        {% for category in categories %}
+          <option value="{{ category }}" {% if category == selected_category %}selected{% endif %}>{{ category }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <button class="btn btn-primary" type="submit">Показать</button>
+  </form>
 </section>
 <div class="row g-4">
   {% for service in services %}

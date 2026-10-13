@@ -26,6 +26,17 @@
     <button class="btn btn-outline-primary" type="button" data-copy-link>Скопировать ссылку</button>
     <span class="copy-feedback" data-copy-feedback role="status" aria-live="polite"></span>
   </article>
+  <section class="mt-4">
+    <h2>Заказы мастера</h2>
+    <ul class="list-group">
+      {% for item in master_orders %}
+        <li class="list-group-item d-flex justify-content-between">
+          <a href="{% url 'orders:detail' item.id %}">{{ item.service_name }}</a>
+          <span>{{ item.booking_date }} · {{ item.status }}</span>
+        </li>
+      {% empty %}<li class="list-group-item">Заказов пока нет.</li>{% endfor %}
+    </ul>
+  </section>
 {% else %}
   <div class="empty-state"><h1>Мастер не найден</h1><p>Проверьте номер мастера или вернитесь к списку.</p></div>
 {% endif %}

@@ -1,7 +1,8 @@
 # Сервис поиска мастеров
 
 Приложение для поиска мастеров и управления заказами. Консольная версия ПР3
-сохранена, в ПР5 добавлен Django, а в ПР6 веб-страницы перенесены на шаблоны.
+сохранена, в ПР5 добавлен Django, в ПР6 веб-страницы перенесены на шаблоны,
+а в ПР7 веб-часть получает данные из SQLite через SQL и `sqlite3`.
 
 ## Назначение
 
@@ -70,9 +71,10 @@
 
 ## Веб-интерфейс ПР6
 
-Django-проект `master_service` использует текущую предметную модель ПР3 и
-JSON-файлы. База данных пока нужна только для служебных компонентов Django:
-перенос сущностей в Django ORM, формы и авторизация будут добавлены позднее.
+Django-проект `master_service` использует текущую предметную модель ПР3.
+После ПР7 веб-страницы берут данные из `data/masters_service.sqlite`;
+JSON-файлы остаются исходными данными импорта и хранилищем консольной версии.
+Отдельный `db.sqlite3` используется только служебными компонентами Django.
 
 ### Django-приложения
 
@@ -86,7 +88,7 @@ JSON-файлы. База данных пока нужна только для �
 `templates/includes/navigation.html`. Шаблоны страниц приложений наследуют
 `base.html` через `{% extends %}` и переопределяют блоки заголовка и содержимого.
 Повторяющиеся карточки мастеров и статусы заказов подключаются через
-`{% include %}`. View-функции загружают объекты из JSON, передают их шаблонам
+`{% include %}`. View-функции получают объекты из SQLite, передают их шаблонам
 через контекст и вызывают `render()`. Списки выводятся циклом `{% for %}` с
 `{% empty %}`, статусы — через `{% if %}`. Фильтры `length`, `default` и `date`
 используются для количества записей, отсутствующих значений и дат.
@@ -102,22 +104,70 @@ JavaScript и логотип расположены в `homepage/static/homepage
 | URL | Назначение |
 | --- | --- |
 | `/` | главная страница и навигация |
-| `/masters/` | список мастеров из `data/masters.json` |
+| `/masters/` | список мастеров из SQLite; фильтр `?min_rating=4.7` |
 | `/masters/1/` | карточка конкретного мастера |
-| `/services/` | каталог услуг из `data/services.json` |
-| `/orders/` | список заказов из `data/orders.json` |
+| `/masters/available/?date=2026-10-01` | свободные мастера на дату |
+| `/services/` | каталог услуг из SQLite; фильтр `?category=Сантехника` |
+| `/orders/` | список заказов из SQLite |
 | `/orders/1/` | карточка конкретного заказа |
+| `/orders/statistics/` | количество активных заказов, статистика по мастерам и услугам |
 
 Все страницы используют HTML, Bootstrap 5.3 через CDN и собственный CSS.
-View-функции загружают объекты через `storage.py`, а динамические адреса
+View-функции загружают объекты через `db/repository.py`, а динамические адреса
 возвращают HTTP 404, если мастер или заказ с указанным ID не существует.
-Предметные модели по-прежнему хранятся в JSON; Django ORM и веб-формы ещё не
-используются.
+Консольное приложение по-прежнему использует JSON. Django ORM для предметных
+сущностей и веб-формы ещё не используются.
+
+## Слой базы данных ПР7
+
+Предметная база `data/masters_service.sqlite` создаётся SQL-файлом
+`sql/schema.sql`. Таблицы:
+
+| Таблица | Поля и типы | Ключи |
+| --- | --- | --- |
+| `masters` | `id INTEGER`, `name TEXT`, `specialty TEXT`, `experience INTEGER`, `rating REAL`, `price_per_hour INTEGER` | `id` — первичный |
+| `users` | `id INTEGER`, `name TEXT`, `role TEXT`, `phone TEXT` | `id` — первичный |
+| `services` | `id INTEGER`, `name TEXT`, `category TEXT`, `estimated_hours REAL`, `master_id INTEGER`, `price REAL` | `id` — первичный, `master_id` — необязательная ссылка на `masters.id` |
+| `orders` | `id INTEGER`, `master_id INTEGER`, `user_id INTEGER`, `service_id INTEGER`, `booking_date TEXT`, `status TEXT` | `id` — первичный; три внешних ключа на мастера, клиента и услугу |
+
+Даты записаны в ISO-формате `YYYY-MM-DD`; статус ограничен значениями
+`Создан` и `Отменён`. При каждом подключении включается
+`PRAGMA foreign_keys = ON`. Соединение в `db/database.py` возвращает
+`sqlite3.Row`, поэтому в Python поля читаются по именам. Скрипт
+`db/import_json.py` через `executemany()` переносит четыре JSON-файла в
+таблицы; повторный запуск обновляет записи с теми же ID без дублей.
+
+Файл `sql/queries.sql` содержит именованные запросы: списки мастеров, услуг и
+клиентов; поиск по ID, рейтингу, категории и дате (`WHERE`); связанные данные
+заказов и заказов мастера (`JOIN`); количество заказов и средний рейтинг
+(`COUNT`, `AVG`); группировку заказов по мастерам и услугам (`GROUP BY`),
+отбор популярных мастеров (`HAVING`) и поиск свободных на дату (`NOT EXISTS`).
+Запросы выполняет `db/repository.py`; введённые значения передаются только
+через параметры `?`. Представления Django получают результаты SQL из этого
+модуля и передают их существующим и новым шаблонам.
+
+Для первого запуска из корня проекта:
+
+```powershell
+.\venv\Scripts\python.exe -m pip install -r requirements.txt
+.\venv\Scripts\python.exe -m db.import_json
+.\venv\Scripts\python.exe manage.py check
+.\venv\Scripts\python.exe manage.py runserver
+```
+
+После запуска откройте `http://127.0.0.1:8000/`. Для проверки SQL вручную
+можно открыть `data/masters_service.sqlite` в SQLite Viewer или использовать
+`sqlite3` из Python. Например:
+
+```powershell
+.\venv\Scripts\python.exe -c "from db.database import get_connection; c=get_connection(); print([dict(r) for r in c.execute('SELECT * FROM masters')]); c.close()"
+```
 
 ### Запуск веб-версии
 
 ```powershell
 .\venv\Scripts\python.exe -m pip install -r requirements.txt
+.\venv\Scripts\python.exe -m db.import_json
 .\venv\Scripts\python.exe manage.py migrate
 .\venv\Scripts\python.exe manage.py runserver
 ```

@@ -7,6 +7,14 @@
   <p class="eyebrow">Найдите исполнителя</p>
   <h1>Наши мастера</h1>
   <p>Специалистов в каталоге: {{ masters|length }}. Выберите профиль, чтобы узнать подробности.</p>
+  <form method="get" class="d-flex gap-2 align-items-end">
+    <label>Рейтинг от
+      <input class="form-control" type="number" name="min_rating" min="0" max="5"
+             step="0.1" value="{{ min_rating }}">
+    </label>
+    <button class="btn btn-primary" type="submit">Найти</button>
+    <a class="btn btn-outline-primary" href="{% url 'masters:available' %}">Свободные на дату</a>
+  </form>
 </section>
 <div class="row g-4">
   {% for master in masters %}

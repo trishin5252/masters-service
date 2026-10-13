@@ -7,6 +7,7 @@
   <p class="eyebrow">История записей</p>
   <h1>Заказы</h1>
   <p>Найдено заказов: {{ orders|length }}.</p>
+  <a class="btn btn-outline-primary" href="{% url 'orders:statistics' %}">Статистика заказов</a>
 </section>
 <div class="order-list">
   {% for order in orders %}

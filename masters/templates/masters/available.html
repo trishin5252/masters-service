@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Свободные мастера — Сервис поиска мастеров{% endblock %}
+
+{% block content %}
+<section class="section-heading">
+  <p class="eyebrow">Поиск по базе данных</p>
+  <h1>Свободные мастера</h1>
+  <p>Доступны на {{ selected_date|date:'d.m.Y' }}: {{ masters|length }}.</p>
+  <form method="get" class="d-flex gap-2 align-items-end">
+    <label>Дата
+      <input class="form-control" type="date" name="date"
+             value="{{ selected_date|date:'Y-m-d' }}" required>
+    </label>
+    <button class="btn btn-primary" type="submit">Найти</button>
+  </form>
+</section>
+<div class="row g-4">
+  {% for master in masters %}
+    <div class="col-md-6">
+      {% include 'masters/includes/master_card.html' %}
+    </div>
+  {% empty %}
+    <div class="col-12"><p class="empty-state">На эту дату свободных мастеров нет.</p></div>
+  {% endfor %}
+</div>
+{% endblock %}
