@@ -63,6 +63,7 @@ def import_data():
                   item['service_id'], item['booking_date'],
                   item.get('status', 'Создан')) for item in orders],
             )
+            connection.commit()
         return {
             name: connection.execute(
                 'SELECT COUNT(*) FROM ' + name  # Fixed names, not user input.
